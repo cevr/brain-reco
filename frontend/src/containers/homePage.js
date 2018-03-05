@@ -71,12 +71,11 @@ class HomePage extends Component {
 }
 
 const mapStateToProps = state => {
-    const { id, entryCount, name, error } = state.reducer;
+    const { id, entryCount, name } = state.reducer;
     return {
         id,
         entryCount,
-        name,
-        error
+        name
     };
 };
 

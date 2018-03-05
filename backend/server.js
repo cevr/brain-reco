@@ -40,27 +40,6 @@ Object.keys(ifaces).forEach(function(ifname) {
     });
 });
 
-db
-    .select('*')
-    .from('users')
-    .then(console.log);
-
-let database = {
-    users: []
-};
-try {
-    database = JSON.parse(fs.readFileSync(databaseFile));
-} catch (err) {
-    console.log('database file does not exist... yet');
-}
-
-let userCounter = 1;
-try {
-    userCounter = JSON.parse(fs.readFileSync(userCountFile));
-} catch (err) {
-    console.log('userCounter file does not exist... yet');
-}
-
 const cookieJar = {};
 
 app.use(bodyParser.json());
@@ -117,33 +96,40 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
     let { password, email } = req.body;
     db
-        .select('email', 'hash')
-        .from('login')
-        .where('email', '=', email)
-        .then(data => {
-            const isValid = bcrypt.compareSync(password, data[0].hash);
-            if (isValid) {
-                return db
-                    .select('*')
-                    .from('users')
-                    .where('email', '=', email)
-                    .then(user => {
-                        const { id, username, entries } = user[0];
-                        res.status(200).send({
-                            res: true,
-                            id,
-                            name: username,
-                            entryCount: entries
+        .transaction(trx => {
+            trx('login')
+                .where('email', '=', email)
+                .update('session', req.session.id)
+                .returning('*')
+                .then(data => {
+                    console.log(data);
+                    const isValid = bcrypt.compareSync(password, data[0].hash);
+                    if (isValid) {
+                        return db
+                            .select('*')
+                            .from('users')
+                            .where('email', '=', email)
+                            .then(user => {
+                                const { id, username, entries } = user[0];
+                                res.status(200).send({
+                                    res: true,
+                                    id,
+                                    name: username,
+                                    entryCount: entries
+                                });
+                            });
+                    } else {
+                        res.send({
+                            res: false,
+                            status: 'Invalid password'
                         });
-                    });
-            } else {
-                res.send({
-                    res: false,
-                    status: 'Invalid password'
-                });
-            }
+                    }
+                })
+                .then(trx.commit)
+                .catch(trx.rollback);
         })
         .catch(err => {
+            console.log(err);
             res.send({
                 res: false,
                 status: 'Invalid email'
@@ -182,6 +168,7 @@ app.get('/profile/:id', (req, res) => {
 
 app.put('/image', (req, res) => {
     const { id } = req.body;
+    console.log('id: ', id);
     db('users')
         .where('id', '=', id)
         .increment('entries', 1)
@@ -201,18 +188,37 @@ app.put('/image', (req, res) => {
 });
 
 app.get('/checkSession', (req, res) => {
-    for (let user of database.users) {
-        if (cookieJar[req.session.id] === user.id) {
-            res.send({
-                res: true,
-                id: user.id,
-                entryCount: user.entries,
-                name: user.username
-            });
-        } else {
-            res.send({ res: false });
-        }
-    }
+    const session = req.session.id;
+    db('users')
+        .join('login', 'users.email', '=', 'login.email')
+        .select('*')
+        .where({
+            session
+        })
+        .then(user => {
+            if (user.length) {
+                const { id, username, entries } = user[0];
+                console.log('entries: ', entries);
+                console.log('username: ', username);
+                res.status(200).send({
+                    res: true,
+                    id,
+                    name: username,
+                    entryCount: entries
+                });
+            } else {
+                res.status(404).send({
+                    res: false,
+                    status: 'not found'
+                });
+            }
+        })
+        .catch(err =>
+            res.status(400).send({
+                res: false,
+                status: 'database error'
+            })
+        );
 });
 
 app.listen(port, () => console.log(`http://${ip}:${port}`));

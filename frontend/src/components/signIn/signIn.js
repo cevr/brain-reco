@@ -4,13 +4,7 @@ import { connect } from 'react-redux';
 import { attemptLogin, checkSession } from '../../redux/asyncActions';
 
 class SignIn extends Component {
-    state = {
-        userInfo: {}
-    };
-
-    componentDidMount() {
-        this.props.checkSession();
-    }
+    state = {};
 
     onEmailChange = event => {
         this.setState({
@@ -27,7 +21,6 @@ class SignIn extends Component {
     onSubmitHandler = () => {
         const { email, password } = this.state;
         const payload = { email, password };
-        console.log('LOGIN', payload);
 
         this.props.logIn(payload);
     };
@@ -74,6 +67,7 @@ class SignIn extends Component {
                         >
                             Sign In
                         </button>
+                        {!this.props.error || <div>{this.props.error}</div>}
                     </div>
                     <div className="lh-copy mt3">
                         <Link
@@ -98,4 +92,11 @@ const mapDispatchToProps = dispatch => {
         }
     };
 };
-export default connect(null, mapDispatchToProps)(SignIn);
+
+const mapStateToProps = state => {
+    const { error } = state.reducer;
+    return {
+        error
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);

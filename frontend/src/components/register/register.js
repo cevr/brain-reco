@@ -85,6 +85,7 @@ class Register extends Component {
                         >
                             Register
                         </button>
+                        {!this.props.error || <div>{this.props.error}</div>}
                     </div>
                     <div className="lh-copy mt3">
                         <Link to="/" className="f5 link dim black db pointer">
@@ -104,5 +105,10 @@ const mapDispatchToProps = dispatch => {
         }
     };
 };
-
-export default connect(null, mapDispatchToProps)(Register);
+const mapStateToProps = state => {
+    const { error } = state.reducer;
+    return {
+        error
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

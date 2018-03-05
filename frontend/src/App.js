@@ -10,8 +10,15 @@ import SignIn from './components/signIn/signIn.js';
 import Register from './components/register/register.js';
 import HomePage from './containers/homePage';
 import Switch from './redux/redux-router';
+import { checkSession } from './redux/asyncActions';
 
 class App extends Component {
+    componentDidMount() {
+        this.props.checkSession();
+    }
+    componentDidUpdate() {
+        console.log(this.props.isSignedIn);
+    }
     render() {
         const { isSignedIn } = this.props;
 
@@ -74,4 +81,11 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = dispatch => {
+    return {
+        checkSession: () => {
+            dispatch(checkSession());
+        }
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(App);
