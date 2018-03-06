@@ -51,7 +51,7 @@ const entryUpdateHandler = (req, res, db) => {
 };
 
 const faceRecognitionAPI = new Clarifai.App({
-    apiKey: 'f6dbeec361614947b1439e42dee8f722'
+    apiKey: process.env.CLARIFAI_API
 });
 
 const imageHandler = (req, res) => {

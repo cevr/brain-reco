@@ -7,7 +7,7 @@ class Navigation extends Component {
             <nav style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <p
                     onClick={() => {
-                        this.props.logOut(this.props.id);
+                        this.props.logOut(this.props.email);
                     }}
                     className="f4 link dim white  pa3 pointer shadow-1 mr3"
                 >
@@ -19,9 +19,9 @@ class Navigation extends Component {
 }
 
 const mapStateToProps = state => {
-    const { id } = state.reducer;
+    const { email } = state.reducer;
     return {
-        id
+        email
     };
 };
 const mapDispatchToProps = dispatch => {

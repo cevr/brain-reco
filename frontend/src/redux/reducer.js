@@ -1,6 +1,6 @@
 const initialState = {
     isSignedIn: false,
-    box: {}
+    box: [{}]
 };
 
 const reducer = (state = initialState, action) => {
@@ -10,6 +10,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isSignedIn: true,
                 id: action.id,
+                email: action.email,
                 name: action.name
             };
 

@@ -18,7 +18,7 @@
         "redux-thunk": "^2.2.0",
         "tachyons": "^4.9.1"
     },
-    "proxy": "http://localhost:4000",
+    "proxy": "https://sheltered-eyrie-90050.herokuapp.com/",
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",

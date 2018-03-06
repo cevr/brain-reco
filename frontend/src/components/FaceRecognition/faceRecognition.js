@@ -7,7 +7,6 @@ class FaceRecognition extends Component {
         return (
             <div className="flex justify-center ma3">
                 <div className="absolute ">
-                    {' '}
                     <img
                         id="inputImage"
                         className="shadow-5 br3 white"
@@ -18,15 +17,18 @@ class FaceRecognition extends Component {
                             maxHeight: 'auto'
                         }}
                     />
-                    <div
-                        className="bounding-box"
-                        style={{
-                            top: box.topRow,
-                            right: box.rightCol,
-                            bottom: box.bottomRow,
-                            left: box.leftCol
-                        }}
-                    />
+                    {box.map((box, i) => (
+                        <div
+                            key={i}
+                            className="bounding-box"
+                            style={{
+                                top: box.topRow,
+                                right: box.rightCol,
+                                bottom: box.bottomRow,
+                                left: box.leftCol
+                            }}
+                        />
+                    ))}
                 </div>
             </div>
         );

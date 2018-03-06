@@ -12,8 +12,14 @@ export const attemptLogin = userInfo => {
             .then(res => res.json())
             .then(json => {
                 if (json.res) {
-                    console.log('ATTEMPT LOGIN NAME', json.name);
-                    dispatch(Action.logIn({ id: json.id, name: json.name }));
+                    console.log('ATTEMPT LOGIN EMAIL', json.email);
+                    dispatch(
+                        Action.logIn({
+                            id: json.id,
+                            name: json.name,
+                            email: json.email
+                        })
+                    );
                     dispatch(Action.setEntryCount(json.entryCount));
                     dispatch(push('/home'));
                 } else {
@@ -24,11 +30,12 @@ export const attemptLogin = userInfo => {
     };
 };
 
-export const attemptLogout = userId => {
+export const attemptLogout = userEmail => {
+    console.log('userEmail: ', userEmail);
     return dispatch => {
         fetch('/logout', {
             method: 'POST',
-            body: JSON.stringify({ id: userId }),
+            body: JSON.stringify({ email: userEmail }),
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
         })
@@ -91,7 +98,13 @@ export const checkSession = () => {
             .then(res => res.json())
             .then(json => {
                 if (json.res) {
-                    dispatch(Action.logIn({ id: json.id, name: json.name }));
+                    dispatch(
+                        Action.logIn({
+                            id: json.id,
+                            name: json.name,
+                            email: json.email
+                        })
+                    );
                     dispatch(Action.setEntryCount(json.entryCount));
                     dispatch(push('/home'));
                 } else {
@@ -103,18 +116,22 @@ export const checkSession = () => {
 
 export const getFacialRecognitionData = input => {
     const calculateFaceLocation = data => {
-        const face = data.outputs[0].data.regions[0].region_info.bounding_box;
         const image = document.querySelector('#inputImage');
         const width = Number(image.width);
         const height = Number(image.height);
         console.log(width, height);
-
-        return {
-            leftCol: face.left_col * width,
-            topRow: face.top_row * height,
-            rightCol: width - face.right_col * width,
-            bottomRow: height - face.bottom_row * height
-        };
+        const Boxes = [];
+        data.outputs[0].data.regions.forEach(data => {
+            const face = data.region_info.bounding_box;
+            Boxes.push({
+                leftCol: face.left_col * width,
+                topRow: face.top_row * height,
+                rightCol: width - face.right_col * width,
+                bottomRow: height - face.bottom_row * height
+            });
+        });
+        console.log('BOXES', Boxes);
+        return Boxes;
     };
     return dispatch => {
         fetch('/imageUrl', {

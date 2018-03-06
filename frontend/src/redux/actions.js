@@ -1,8 +1,9 @@
-export const logIn = ({ id, name }) => {
+export const logIn = ({ id, name, email }) => {
     return {
         type: 'LOGIN',
         id,
-        name
+        name,
+        email
     };
 };
 

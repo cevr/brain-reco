@@ -7,14 +7,12 @@ const userFlow = require('./controllers/userFlow');
 const db = require('knex')({
     client: 'pg',
     connection: {
-        host: '127.0.0.1',
-        user: 'cev',
-        password: '',
-        database: 'brain-reco'
+        connectionString: process.env.DATABASE_URL,
+        ssl: true
     }
 });
 
-const PORT = 4000;
+const PORT = process.env.PORT;
 const IP = require('./getIp').ip;
 app.use(bodyParser.json());
 app.use(
@@ -24,6 +22,10 @@ app.use(
         saveUninitialized: true
     })
 );
+
+app.get('/', (req, res) => {
+    res.send('It is alive');
+});
 
 app.post('/register', (req, res) =>
     sessionFlow.registerHandler(req, res, db, bcrypt)

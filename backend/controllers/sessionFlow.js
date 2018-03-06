@@ -66,10 +66,16 @@ const loginHandler = (req, res, db, bcrypt) => {
                             .from('users')
                             .where('email', '=', email)
                             .then(user => {
-                                const { id, username, entries } = user[0];
+                                const {
+                                    id,
+                                    username,
+                                    entries,
+                                    email
+                                } = user[0];
                                 res.status(200).send({
                                     res: true,
                                     id,
+                                    email,
                                     name: username,
                                     entryCount: entries
                                 });
@@ -94,11 +100,12 @@ const loginHandler = (req, res, db, bcrypt) => {
 };
 
 const logoutHandler = (req, res, db) => {
-    const { id } = req.body;
-    db
+    const { email } = req.body;
+    db('users')
+        .join('login', 'users.email', '=', 'login.email')
         .select('*')
         .from('login')
-        .where({ id })
+        .where({ email })
         .update('session', null)
         .returning('*')
         .then(user => {
@@ -130,12 +137,13 @@ const sessionCheckHandler = (req, res, db) => {
         })
         .then(user => {
             if (user.length) {
-                const { id, username, entries } = user[0];
+                const { id, username, entries, email } = user[0];
                 console.log('entries: ', entries);
                 console.log('username: ', username);
                 res.status(200).send({
                     res: true,
                     id,
+                    email,
                     name: username,
                     entryCount: entries
                 });
