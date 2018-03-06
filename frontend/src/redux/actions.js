@@ -25,3 +25,10 @@ export const setError = error => {
         error
     };
 };
+
+export const setFaceRecognitionData = box => {
+    return {
+        type: 'SET_FACE_RECOGNITION_DATA',
+        box
+    };
+};

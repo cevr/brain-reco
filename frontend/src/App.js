@@ -16,9 +16,7 @@ class App extends Component {
     componentDidMount() {
         this.props.checkSession();
     }
-    componentDidUpdate() {
-        console.log(this.props.isSignedIn);
-    }
+
     render() {
         const { isSignedIn } = this.props;
 

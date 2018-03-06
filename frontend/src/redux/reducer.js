@@ -1,5 +1,6 @@
 const initialState = {
-    isSignedIn: false
+    isSignedIn: false,
+    box: {}
 };
 
 const reducer = (state = initialState, action) => {
@@ -26,6 +27,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: action.error
+            };
+        case 'SET_FACE_RECOGNITION_DATA':
+            return {
+                ...state,
+                box: action.box
             };
         default:
             return {

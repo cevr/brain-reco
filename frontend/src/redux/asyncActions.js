@@ -24,6 +24,26 @@ export const attemptLogin = userInfo => {
     };
 };
 
+export const attemptLogout = userId => {
+    return dispatch => {
+        fetch('/logout', {
+            method: 'POST',
+            body: JSON.stringify({ id: userId }),
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json.res) {
+                    dispatch(Action.logOut());
+                    dispatch(push('/signIn'));
+                } else {
+                    console.log(json.status);
+                }
+            });
+    };
+};
+
 export const register = userInfo => {
     return dispatch => {
         fetch('/register', {
@@ -76,6 +96,45 @@ export const checkSession = () => {
                     dispatch(push('/home'));
                 } else {
                     console.log(json.res);
+                }
+            });
+    };
+};
+
+export const getFacialRecognitionData = input => {
+    const calculateFaceLocation = data => {
+        const face = data.outputs[0].data.regions[0].region_info.bounding_box;
+        const image = document.querySelector('#inputImage');
+        const width = Number(image.width);
+        const height = Number(image.height);
+        console.log(width, height);
+
+        return {
+            leftCol: face.left_col * width,
+            topRow: face.top_row * height,
+            rightCol: width - face.right_col * width,
+            bottomRow: height - face.bottom_row * height
+        };
+    };
+    return dispatch => {
+        fetch('/imageUrl', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ input })
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json.res) {
+                    dispatch(
+                        Action.setFaceRecognitionData(
+                            calculateFaceLocation(json.data)
+                        )
+                    );
+                } else {
+                    console.log(json.status);
                 }
             });
     };
